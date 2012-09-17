@@ -181,6 +181,30 @@ function! CreateSyntax()
 endfun
 call CreateSyntax()
 
+function! CreateInnerSyntax()
+    for num in [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        " TODO: remove codey ones
+        for group in ["UB", "UT", "TA", "PT", "BT", "OL"]
+            for [format, wrap] in [["bold", "\\*"], ["italic", "/"], ["underline", "_"]]
+                let synId = synIDtrans(hlID(group . num))
+                let name = group . num . format
+                exec "syntax region " . name . " start=+\\_s\\zs" . wrap . "\\<+ end=+\\>" . wrap . "\\_s\\@=+ keepend oneline containedin=" . group . num
+                let hiStr = "hi def " . name . " term=" . format . " cterm=" . format . " gui=" . format
+                for mode in ["gui", "cterm", "term"]
+                    for attr in ["font", "fg", "bg", "sp"]
+                        let val = synIDattr(synId, attr, mode)
+                        if ((type(val) == type(0) || type(val) == type(0.0)) && val > 0) || (type(val) == type("") && val != "" && val != "-1")
+                            let hiStr = hiStr . " " . mode . attr . "=" . val
+                        endif
+                    endfor
+                endfor
+                exec hiStr
+            endfor
+        endfor
+    endfor
+endfun
+call CreateInnerSyntax()
+
 " Auto-commands {{{1
 if !exists("autocommand_vo_loaded")
 	let autocommand_vo_loaded = 1
